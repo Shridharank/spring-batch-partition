@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: org.springframework.batch:spring-batch-core:6.0.1" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="org.springframework.batch" artifactId="spring-batch-core" version="6.0.1" baseVersion="6.0.1" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.springframework.batch/spring-batch-core/6.0.1/3b8a60591e5c055fa971349a48197053762cf2/spring-batch-core-6.0.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.springframework.batch/spring-batch-core/6.0.1/9b1c086f3d671e04f55990a996f81c321e50a9bc/spring-batch-core-6.0.1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
