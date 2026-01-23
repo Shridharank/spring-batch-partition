@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/spring-batch.iml" filepath="$PROJECT_DIR$/spring-batch.iml" />
+      <module fileurl="file://$PROJECT_DIR$/spring-batch-parition.iml" filepath="$PROJECT_DIR$/spring-batch-parition.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/spring-batch-parition.main.iml" filepath="$PROJECT_DIR$/.idea/modules/spring-batch-parition.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/spring-batch-parition.test.iml" filepath="$PROJECT_DIR$/.idea/modules/spring-batch-parition.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/spring-batch-partition.iml" filepath="$PROJECT_DIR$/.idea/spring-batch-partition.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/spring-batch.main.iml" filepath="$PROJECT_DIR$/.idea/modules/spring-batch.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/spring-batch.test.iml" filepath="$PROJECT_DIR$/.idea/modules/spring-batch.test.iml" />
+    </modules>
+  </component>
+</project>
