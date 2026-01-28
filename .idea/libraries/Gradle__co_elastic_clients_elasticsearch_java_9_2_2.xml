@@ -5,6 +5,8 @@
       <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/co.elastic.clients/elasticsearch-java/9.2.2/b7912145181a058f3f0d3b05468e0f20588fd4cc/elasticsearch-java-9.2.2.jar!/" />
     </CLASSES>
     <JAVADOC />
-    <SOURCES />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/co.elastic.clients/elasticsearch-java/9.2.2/b65784061b2cc41af5e5cdc526a9bd0a9f5bdfaf/elasticsearch-java-9.2.2-sources.jar!/" />
+    </SOURCES>
   </library>
 </component>
