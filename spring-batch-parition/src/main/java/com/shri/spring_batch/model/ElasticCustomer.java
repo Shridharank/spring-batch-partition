@@ -15,8 +15,8 @@ import java.math.BigDecimal;
 public class ElasticCustomer {
 
     @Id
-    private Integer id;
 
+    private Integer id;
     private String firstName;
     private String lastName;
     private String email;

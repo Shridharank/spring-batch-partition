@@ -20,9 +20,10 @@ public class JpaJobRunner implements JobRunner {
         this.jobOperator = jobOperator;
     }
     @Override
-    public void run() throws Exception {
+    public void run(String inputFilePath) throws Exception {
         JobParameters jobParameters = new JobParametersBuilder()
                 .addLong("startAt",System.currentTimeMillis())
+                .addString("inputFilePath", inputFilePath)
                 .toJobParameters();
         jobOperator.start(jpaRepoJob, jobParameters);
     }

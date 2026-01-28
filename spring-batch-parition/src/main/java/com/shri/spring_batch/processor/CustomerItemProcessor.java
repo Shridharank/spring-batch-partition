@@ -84,7 +84,7 @@ public class CustomerItemProcessor implements ItemProcessor<CustomerInput, Custo
 
     private ElasticCustomer mapToElasticCustomer(CustomerInput customerInput) {
         ElasticCustomer elasticCustomer = new ElasticCustomer();
-        elasticCustomer.setId(null);
+        elasticCustomer.setId(customerInput.getId());
         elasticCustomer.setFirstName(customerInput.getFirstName().toUpperCase());
         elasticCustomer.setLastName(customerInput.getLastName().toUpperCase());
         elasticCustomer.setGender(customerInput.getGender());
