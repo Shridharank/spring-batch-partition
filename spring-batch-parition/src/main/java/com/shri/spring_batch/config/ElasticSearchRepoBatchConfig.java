@@ -1,6 +1,8 @@
 package com.shri.spring_batch.config;
 
+import co.elastic.clients.elasticsearch.core.SearchRequest;
 import com.shri.spring_batch.exception.CustomerValidationException;
+import com.shri.spring_batch.kafka.listener.KafkaItemWriter;
 import com.shri.spring_batch.listener.CustomerErrorSkipListener;
 import com.shri.spring_batch.listener.ErrorWriterStepListener;
 import com.shri.spring_batch.model.CustomerInput;
@@ -28,7 +30,9 @@ import org.springframework.batch.infrastructure.item.support.CompositeItemWriter
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
@@ -54,15 +58,18 @@ public class ElasticSearchRepoBatchConfig {
     @StepScope
     public FlatFileItemReader<CustomerInput> esPartitionedItemReaderCsv(
             @Value("#{stepExecutionContext[startLine]}") Integer start,
-            @Value("#{stepExecutionContext[endLine]}") Integer end
-    ) {
+            @Value("#{stepExecutionContext[endLine]}") Integer end,
+            @Value("#{jobParameters['inputFilePath']}") String inputFilePath
+    ) throws IOException {
 
         System.out.println("Partitioned Item Reader Start Line: " + start + ", End Line: " + end);
+        Resource resource = new DefaultResourceLoader().getResource(inputFilePath);
+        System.out.println("Resource file path: "+resource.getFilePath());
         return new FlatFileItemReaderBuilder<CustomerInput>()
                 .name("esPartitionedItemReaderCsv")
-                .resource(new FileSystemResource("src/main/resources/dummy_users_1000_with_accounts.csv"))
-                .linesToSkip(1)
-                .recordSeparatorPolicy(new RangeRecordSeparatorPolicy(end - start + 1))
+                .resource(resource)
+                .linesToSkip(start)
+                .maxItemCount(end - start + 1)
                 .lineMapper(readLineMapper())
                 .build();
     }
@@ -76,8 +83,10 @@ public class ElasticSearchRepoBatchConfig {
     @StepScope
     public ItemWriter<CustomerWrapper> itemWriterElasticRepo() {
         return items -> {
+
             List<ElasticCustomer> list = items.getItems().stream()
                     .map(CustomerWrapper::getElasticCustomer).toList();
+            System.out.println("Item List size: "+list.size());
             elasticsearchRepository.saveAll(list);
         };
     }
@@ -125,10 +134,17 @@ public class ElasticSearchRepoBatchConfig {
     @Bean
     public CompositeItemWriter<CustomerWrapper> compositeItemWriter(
             ItemWriter<CustomerWrapper> itemWriterElasticRepo,
-            FlatFileItemWriter<CustomerWrapper> processedCustomerWriterCsv
+            FlatFileItemWriter<CustomerWrapper> processedCustomerWriterCsv,
+            KafkaItemWriter kafkaItemWriter
     ) {
         CompositeItemWriter<CustomerWrapper> compositeItemWriter = new CompositeItemWriter<>();
-        compositeItemWriter.setDelegates(List.of(itemWriterElasticRepo, processedCustomerWriterCsv));
+        compositeItemWriter.setDelegates(
+                List.of(
+                        itemWriterElasticRepo,
+                        processedCustomerWriterCsv,
+                        kafkaItemWriter
+                )
+        );
         return compositeItemWriter;
     }
 
@@ -147,6 +163,8 @@ public class ElasticSearchRepoBatchConfig {
                 .skipListener(customerErrorSkipListener)
                 .listener(errorWriterStepListener)
                 .build();
+
+
     }
 
     @Bean

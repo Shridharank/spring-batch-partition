@@ -2,6 +2,7 @@ package com.shri.spring_batch.controller;
 
 import com.shri.spring_batch.jobrunner.JobRunner;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,6 +17,9 @@ public class CustomerController {
 
     //private final JobOperator jobOperator;
     private final Map<String, JobRunner> jobRunnerMap;
+
+    @Value("${batch.input-file}")
+    private String inputFilePath;
 
     /*@Qualifier("elasticSearchRepoJob")
     private final Job elasticSearchRepoJob;
@@ -55,7 +59,7 @@ public class CustomerController {
             return "No job found for type: " + type;
         }
 
-        jobRunner.run();
+        jobRunner.run(inputFilePath);
         return type.toLowerCase()+" import job started.";
     }
 }

@@ -8,6 +8,8 @@ import com.shri.spring_batch.model.CustomerWrapper;
 import com.shri.spring_batch.model.JpaCustomer;
 import com.shri.spring_batch.processor.CustomerItemProcessor;
 import com.shri.spring_batch.repository.CustomerJpaRepository;
+import com.shri.spring_batch.service.FlatFileItemPartitioner;
+import jakarta.persistence.EntityManagerFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.job.Job;
@@ -18,6 +20,7 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.infrastructure.item.ItemWriter;
+import org.springframework.batch.infrastructure.item.database.JpaItemWriter;
 import org.springframework.batch.infrastructure.item.file.FlatFileItemReader;
 import org.springframework.batch.infrastructure.item.file.FlatFileItemWriter;
 import org.springframework.batch.infrastructure.item.file.builder.FlatFileItemReaderBuilder;
@@ -26,7 +29,9 @@ import org.springframework.batch.infrastructure.item.support.CompositeItemWriter
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
@@ -46,15 +51,19 @@ public class JpaRepoBatchConfig {
 
     private final JobRepository jobRepository;
     private final CustomerJpaRepository jpaRepository;
+    private final FlatFileItemPartitioner flatFileItemPartitioner;
 
     //Reader
     @Bean
     @StepScope
-    public FlatFileItemReader<CustomerInput> jpaItemReader() {
-
+    public FlatFileItemReader<CustomerInput> jpaItemReaderCsv(
+            @Value("#{jobParameters['inputFilePath']}") String inputFilePath
+    ) throws IOException {
+        Resource resource = new DefaultResourceLoader().getResource(inputFilePath);
+        System.out.println("Resource file path: "+resource.getFilePath());
         return new FlatFileItemReaderBuilder<CustomerInput>()
-                .name("jpaCsvReader")
-                .resource(new FileSystemResource("src/main/resources/dummy_users_1000_with_accounts.csv"))
+                .name("jpaItemReaderCsv")
+                .resource(resource)
                 .linesToSkip(1)
                 .lineMapper(readLineMapper())
                 .build();
@@ -68,10 +77,15 @@ public class JpaRepoBatchConfig {
 
     //Writer
     @Bean
-    public ItemWriter<CustomerWrapper> jpaItemWriter() {
+    @StepScope
+    public ItemWriter<CustomerWrapper> jpaItemWriter(EntityManagerFactory emf) {
+        System.out.println("Jpa Repo write");
+        /*JpaItemWriter<CustomerWrapper> jpaItemWriter = new JpaItemWriter<>(emf);
+        return jpaItemWriter;*/
         return items -> {
             List<JpaCustomer> list = items.getItems().stream()
                     .map(CustomerWrapper::getJpaCustomer).toList();
+            System.out.println("List to save: "+list);
             jpaRepository.saveAll(list);
         };
     }
@@ -117,6 +131,7 @@ public class JpaRepoBatchConfig {
     }
 
     @Bean
+    @StepScope
     public CompositeItemWriter<CustomerWrapper> compositeJpaItemWriter(
             ItemWriter<CustomerWrapper> jpaItemWriter,
             FlatFileItemWriter<CustomerWrapper> processedCustomerWriter
@@ -128,12 +143,13 @@ public class JpaRepoBatchConfig {
     }
 
     @Bean
-    public Step jpaRepoStep(SkipListener<CustomerInput, CustomerWrapper> customerErrorSkipListener,
+    public Step jpaSlaveStep(FlatFileItemReader<CustomerInput> jpaItemReaderCsv,
+                            SkipListener<CustomerInput, CustomerWrapper> customerErrorSkipListener,
                             CompositeItemWriter <CustomerWrapper> compositeJpaItemWriter,
                             StepExecutionListener errorWriterStepListener) {
         return new StepBuilder("csvImport", jobRepository)
                 .<CustomerInput, CustomerWrapper>chunk(100)
-                .reader(jpaItemReader())
+                .reader(jpaItemReaderCsv)
                 .processor(jpaItemProcessor())
                 .writer(compositeJpaItemWriter)
                 .faultTolerant()
@@ -141,23 +157,30 @@ public class JpaRepoBatchConfig {
                 .skipLimit(Integer.MAX_VALUE)
                 .skipListener(customerErrorSkipListener)
                 .listener(errorWriterStepListener)
+                .build();
+    }
+
+    public Step masterStep(Step jpaSlaveStep) {
+        return new StepBuilder("masterStep", jobRepository)
+                .partitioner("jpaSlaveStep", flatFileItemPartitioner)
+                .step(jpaSlaveStep)
+                .gridSize(4)
                 .taskExecutor(jpaTaskExecutor())
                 .build();
     }
 
     @Bean
-    public Job jpaRepoJob(Step jpaRepoStep) {
-        return new JobBuilder("customerJpaJob", jobRepository)
-                .start(jpaRepoStep)
+    public Job jpaRepoJob(Step masterStep) {
+        return new JobBuilder("jpaRepoJob", jobRepository)
+                .start(masterStep)
                 .build();
     }
 
     @Bean
     public AsyncTaskExecutor jpaTaskExecutor() {
         ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
-        taskExecutor.setCorePoolSize(5);
+        taskExecutor.setCorePoolSize(4);
         taskExecutor.setMaxPoolSize(10);
-        taskExecutor.setQueueCapacity(25);
         taskExecutor.setThreadNamePrefix("jpa-batch-");
         taskExecutor.initialize();
         return taskExecutor;
