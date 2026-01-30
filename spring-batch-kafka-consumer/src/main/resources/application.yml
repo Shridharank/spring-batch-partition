@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: spring-batch-kafka-consumer
+  kafka:
+    topic:
+      customer-processed-data: customer-processed-data
+      customer-error-data: customer-error-data
+    consumer-group-prefix: spring_batch_kafka
+    bootstrap-server: localhost:9092
+
+server:
+  port:
+    8082
