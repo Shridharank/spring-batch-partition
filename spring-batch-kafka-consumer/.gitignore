@@ -35,3 +35,9 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### MacOS ###
+.DS_Store
+/db/repayments.mv.db
+/db/repayments.trace.db
+/db/repayments.lock.db

@@ -3,6 +3,9 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/spring-batch.iml" filepath="$PROJECT_DIR$/spring-batch.iml" />
+      <module fileurl="file://$PROJECT_DIR$/spring-batch-kafka-consumer.iml" filepath="$PROJECT_DIR$/spring-batch-kafka-consumer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/spring-batch-kafka-consumer.main.iml" filepath="$PROJECT_DIR$/.idea/modules/spring-batch-kafka-consumer.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/spring-batch-kafka-consumer.test.iml" filepath="$PROJECT_DIR$/.idea/modules/spring-batch-kafka-consumer.test.iml" />
       <module fileurl="file://$PROJECT_DIR$/spring-batch-parition.iml" filepath="$PROJECT_DIR$/spring-batch-parition.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/spring-batch-parition.main.iml" filepath="$PROJECT_DIR$/.idea/modules/spring-batch-parition.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/spring-batch-parition.test.iml" filepath="$PROJECT_DIR$/.idea/modules/spring-batch-parition.test.iml" />
