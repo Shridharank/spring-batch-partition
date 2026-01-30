@@ -7,11 +7,14 @@
         <processorPath useClasspath="false">
           <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.projectlombok/lombok/1.18.42/8365263844ebb62398e0dc33057ba10ba472d3b8/lombok-1.18.42.jar" />
         </processorPath>
-        <module name="spring-batch-parition.main" />
+        <module name="spring-batch-kafka-consumer.main" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="spring-batch" target="21" />
+      <module name="spring-batch-kafka-consumer" target="21" />
+      <module name="spring-batch-kafka-consumer.main" target="21" />
+      <module name="spring-batch-kafka-consumer.test" target="21" />
       <module name="spring-batch-parition" target="21" />
       <module name="spring-batch-parition.main" target="21" />
       <module name="spring-batch-parition.test" target="21" />
@@ -22,6 +25,9 @@
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="spring-batch" options="-parameters" />
+      <module name="spring-batch-kafka-consumer" options="-parameters" />
+      <module name="spring-batch-kafka-consumer.main" options="-parameters" />
+      <module name="spring-batch-kafka-consumer.test" options="-parameters" />
       <module name="spring-batch-parition" options="-parameters" />
       <module name="spring-batch-parition.main" options="-parameters" />
       <module name="spring-batch-parition.test" options="-parameters" />

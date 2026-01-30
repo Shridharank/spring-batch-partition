@@ -1,4 +1,4 @@
-package com.shri.kafka.comsumer;
+package com.shri.kafka.listener;
 
 import com.shri.kafka.event.EventConsumer;
 import com.shri.kafka.model.model.ElasticCustomer;
