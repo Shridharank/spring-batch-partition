@@ -26,7 +26,14 @@ spring:
     job:
       enabled: false
     kafka:
-      topic: customer-batch-topic
+      topics:
+        customer-processed-data: customer-processed-data
+        customer-error-data: customer-error-data
+
+  kafka:
+    bootstrap-server: localhost:9092
+    admin:
+      auto-create: true
 
   elasticsearch:
     uri: http://localhost:9200
@@ -36,9 +43,6 @@ spring:
 
   main:
     allow-bean-definition-overriding: true
-
-  kafka:
-    bootstrap-server: localhost:9092
 
 server:
   port: 8080
